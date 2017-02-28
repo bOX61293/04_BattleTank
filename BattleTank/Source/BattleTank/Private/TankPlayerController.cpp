@@ -5,6 +5,17 @@
 
 
 
+///Functions
+
+void ATankPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+
+
+	return;
+}
+
 
 ATank* ATankPlayerController::GetControlledTank() const
 {
