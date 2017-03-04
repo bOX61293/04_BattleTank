@@ -41,8 +41,7 @@ void ATankPlayerController::AimTowardsCrosshair()
 	FVector HitLocation; //Out Parameter
 	if (GetSightRayHitLocation(HitLocation)) //Had side effect, is going to ray trace
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit Location: %s"), *HitLocation.ToString()); //Logging the hit location of Crosshair
-		//TODO Tell controlled tank to aim at this point
+		GetControlledTank()->AimAt(HitLocation);
 	}
 	return;
 }
@@ -51,6 +50,48 @@ void ATankPlayerController::AimTowardsCrosshair()
 //Get world location through the crosshair, true if hits landscape
 bool ATankPlayerController::GetSightRayHitLocation(FVector& HitLocation) const
 {
-	HitLocation = FVector(1.0);
+	//Find the Crosshair Position
+	int32 ViewportSizeX, ViewportSizeY; //Size of the game screen
+	GetViewportSize(ViewportSizeX, ViewportSizeY);
+	auto ScreenLocation = FVector2D(ViewportSizeX * CrosshairXLocation, ViewportSizeY * CrosshairYLocation);
+
+	//De-project the screen position of the crosshair to a world direction
+	FVector LookDirection;
+	if (GetLookDirection(ScreenLocation, LookDirection))
+	{
+		//Line trace along that look direction, and see what we hit (Up to some maximum range)
+		GetLookVectorHitLocation(LookDirection, HitLocation);
+	}
+
+
+	return true;
+}
+
+
+bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector& LookDirection) const
+{
+	FVector CameraWorldLocation; //To be discarded
+	return DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, CameraWorldLocation, LookDirection);
+}
+
+
+bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const
+{
+	FHitResult HitResult;
+	auto StartLocation = PlayerCameraManager->GetCameraLocation();
+	auto EndLocation = StartLocation + (LookDirection * LineTraceRange);
+	
+	if (GetWorld()->LineTraceSingleByChannel(
+			HitResult,
+			StartLocation,
+			EndLocation,
+			ECollisionChannel::ECC_Visibility)
+		)
+	{
+		HitLocation = HitResult.Location;
+		return true;
+	}
+
+	HitLocation = FVector(0);
 	return false;
 }
