@@ -10,7 +10,7 @@
 ATank::ATank()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 
 	//No need to protect pointers as added at constructor
@@ -23,11 +23,6 @@ void ATank::BeginPlay()
 	Super::BeginPlay();
 }
 
-
-void ATank::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 
 
 // Called to bind functionality to input
