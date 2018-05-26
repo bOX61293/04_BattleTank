@@ -1,5 +1,6 @@
 // Andrew Sushko 2017
 
+#include "TankAimingComponent.h"
 #include "BattleTank.h"
 #include "Tank.h"
 
