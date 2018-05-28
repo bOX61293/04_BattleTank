@@ -1,7 +1,8 @@
 // Andrew Sushko 2017
 
-#include "TankBarrel.h"
 #include "BattleTank.h"
+#include "TankBarrel.h"
+#include "TankTurret.h"
 #include "TankAimingComponent.h"
 
 class UTankBarrel; //Forward declaration
@@ -16,7 +17,20 @@ UTankAimingComponent::UTankAimingComponent()
 
 void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet)
 {
+	if (!BarrelToSet) // Pointer Protection Code
+	{
+		return;
+	}
 	Barrel = BarrelToSet;
+}
+
+void UTankAimingComponent::SetTurretReference(UTankTurret* TurretToSet)
+{
+	if (!TurretToSet) // Pointer Protection Code
+	{
+		return;
+	}
+	Turret = TurretToSet;
 }
 
 void UTankAimingComponent::AimingGeneral(FVector WorldSpaceAim, FString CurrentTankName, float LaunchSpeed)
@@ -54,7 +68,7 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 	auto AimAsRotator = AimDirection.Rotation();
 	auto DeltaRotator = AimAsRotator - BarrelRotator;
 
-	Barrel->Elevate(5); //TODO Remove magic number
+	Barrel->Elevate(DeltaRotator.Pitch); 
 
 
 	return;
